@@ -19,21 +19,25 @@ function read_folder(path){
                     break;
                 else {
                     var new_path = path.endsWith("/") ? path.concat(items[1]) : path.concat("/").concat(items[1]);
-                    fs.stat(new_path, function(err, stats){
-                        if(err != undefined)
-                            console.log(err);
-                        else{
-                            if(stats.isDirectory())
-                                read_folder(new_path);
-                            else
-                                stop_loop = true;
-                        }
-                    });
+                    fs.stat(new_path, generate_callback);
                 }
             }
             convert(path);
         }
     });
+}
+
+function generate_callback(file) {
+    return function(err, stats) {
+        if(err != undefined)
+            console.log(err);
+        else{
+            if(stats.isDirectory())
+                read_folder(new_path);
+            else
+                stop_loop = true;
+        }
+    }
 }
 
 function convert(folder){
