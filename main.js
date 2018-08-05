@@ -18,7 +18,6 @@ fs.readdir(path, function (err, items) {
     setTimeout(function () {
         read_chapter(chapters.shift());
     }, 30000);
-
 });
 
 function callback(file) {
@@ -42,32 +41,48 @@ function read_chapter(chapter) {
                 return function (err, stats) {
                     imgs.push(f.concat("/"));
                 }
-            }(file));
+            }(items[i]));
         }
         callback();
     });
 
-    setTimeout(function(){
+    setTimeout(function () {
         hashmap.push([chapter, imgs]);
-        console.log(chapter);
-        console.log(imgs);
 
-        if(chapters.length > 0) // stopping condition
+        if (chapters.length > 0)
             read_chapter(chapters.shift());
-        else{
-            console.log("FIM DA RECURSAO");
-            console.log(hashmap);
+        else {
+            console.log("__STARTING CONVERTION__");
+            this.first = hashmap.shift();
+            convert(this.first[0], this.first[1]);
         }
-            
-    }, 10000);
+
+    }, 5000);
 }
 
-/* var original = folder + '/' + items[i];
-var conv = destiny + "/" + items[i].replace(".webp", ".png");
+function convert(folder, imgArray) {
+    console.log("CONVERTING >> " + folder);
+    this.f_orig = folder;
+    this.f_dest = folder.endsWith("/") ? folder.substring(0, folder.lastIndexOf("/")).concat("_conv") : folder.concat("_conv");
 
-webp.dwebp(original, conv, "-o", function (status) {
-    if (status === '100')
-        console.log("Imagem '" + conv + "' exicuted successfully");
-    else
-        console.log("exicuted unsuccessfully status " + status);
-}); */
+    if (!fs.existsSync(f_dest))
+        fs.mkdirSync(f_dest);
+
+    for (var a = 0; a < imgArray.length; ++a) {
+        this.img_ = imgArray[a].replace("/", "");
+        this.in = f_orig.endsWith("/") ? f_orig.concat(this.img_) : f_orig.concat("/").concat(this.img_);
+        this.out = f_dest.endsWith("/") ? f_dest.concat(this.img_.replace("webp", "png")) : f_dest.concat("/").concat(this.img_.replace("webp", "png"));
+
+        webp.dwebp(this.in, this.out, "-o", function (status) {
+            if (status === '101')
+                console.log("Executed unsuccessfully status " + status + " - file: " + this.in);
+        });
+    }
+
+    setTimeout(function () {
+        if (hashmap.length > 0) {
+            this.next = hashmap.shift();
+            convert(this.next[0], this.next[1]);
+        }
+    }, 25000);
+}
