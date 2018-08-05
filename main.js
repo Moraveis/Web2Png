@@ -5,69 +5,69 @@ if (process.argv.length <= 2) {
     console.log("Usage: " + __filename + " path/to/directory");
     process.exit(-1);
 }
- 
+
 var path = process.argv[2];
+var chapters = [];
+var hashmap = [];
 
-function read_folder(path){
-    fs.readdir(path, function(err, items){
-        if(err != undefined)
+fs.readdir(path, function (err, items) {
+    for (var i = 0; i < items.length; ++i) {
+        fs.stat(path.concat(items[i]), callback(path.concat(items[i])));
+    }
+
+    setTimeout(function () {
+        read_chapter(chapters.shift());
+    }, 30000);
+
+});
+
+function callback(file) {
+    return function (err, stats) {
+        if (err)
             console.log(err);
-        else{
-            var stop_loop = false;
-            for(var i = 0; i < items.length; i++){
-                if(stop_loop)
-                    break;
-                else {
-                    var new_path = path.endsWith("/") ? path.concat(items[1]) : path.concat("/").concat(items[1]);
-                    fs.stat(new_path, generate_callback);
+        else {
+            if (stats.isDirectory()) {
+                chapters.push(file.concat("/"));
+            }
+        }
+    };
+}
+
+function read_chapter(chapter) {
+    this.imgs = [];
+    fs.readdir(chapter, function (err, items) {
+        for (var i = 0; i < items.length; ++i) {
+            this.file = chapter.concat(items[i]);
+            fs.stat(file, function (f) {
+                return function (err, stats) {
+                    imgs.push(f.concat("/"));
                 }
-            }
-            convert(path);
+            }(file));
         }
+        callback();
     });
-}
 
-function generate_callback(file) {
-    return function(err, stats) {
-        if(err != undefined)
-            console.log(err);
+    setTimeout(function(){
+        hashmap.push([chapter, imgs]);
+        console.log(chapter);
+        console.log(imgs);
+
+        if(chapters.length > 0) // stopping condition
+            read_chapter(chapters.shift());
         else{
-            if(stats.isDirectory())
-                read_folder(new_path);
-            else
-                stop_loop = true;
+            console.log("FIM DA RECURSAO");
+            console.log(hashmap);
         }
-    }
+            
+    }, 10000);
 }
 
-function convert(folder){
-    var destiny = folder.concat("_conv");
+/* var original = folder + '/' + items[i];
+var conv = destiny + "/" + items[i].replace(".webp", ".png");
 
-    if(!fs.existsSync(destiny)){
-        fs.mkdirSync(destiny);
-    }
-
-    fs.readdir(folder, function(err, items) {
-        if(err != undefined)
-            console.log(err);
-        else { 
-            for (var i=0; i<items.length; i++) {
-                var original = folder + '/' + items[i];
-                var conv = destiny + "/" + items[i].replace(".webp", ".png");
-
-                webp.dwebp(original, conv, "-o", function(status){
-                    if(status === '100')
-                        console.log("Imagem '" + conv + "' exicuted successfully");
-                    else
-                        console.log("exicuted unsuccessfully status " + status);
-                });
-            }
-        }
-    });
-}
-
-function main(path){
-    read_folder(path);
-}
-
-main(path);
+webp.dwebp(original, conv, "-o", function (status) {
+    if (status === '100')
+        console.log("Imagem '" + conv + "' exicuted successfully");
+    else
+        console.log("exicuted unsuccessfully status " + status);
+}); */
