@@ -17,7 +17,7 @@ fs.readdir(path, function (err, items) {
 
     setTimeout(function () {
         read_chapter(chapters.shift());
-    }, 30000);
+    }, 5000);
 });
 
 function callback(file) {
@@ -84,5 +84,5 @@ function convert(folder, imgArray) {
             this.next = hashmap.shift();
             convert(this.next[0], this.next[1]);
         }
-    }, 25000);
+    }, 15000);
 }
